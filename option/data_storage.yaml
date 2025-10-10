@@ -4,81 +4,95 @@ stream:
     - streamer:
         tag: str_gnss_rov
         type: serial
-        port: /dev/ttyUSB0
-        baudrate: 921600
-    - streamer:
-        tag: str_gnss_ref
-        type: ntrip-client
-        ip: 101.132.190.162
-        port: 8001
-        username: ...
-        passward: ...
-        mountpoint: ...
-    - streamer:
-        tag: str_gnss_eph
-        type: ntrip-client
-        ip: 101.132.190.162
-        port: 8001
-        username: ...
-        passward: ...
-        mountpoint: ...
-    - streamer:
-        tag: str_gnss_ssr
-        output_tags: [fmt_gnss_ssr]
-        type: ntrip-client
-        ip: 112.65.161.226
-        port: 2101
-        username: ...
-        passward: ...
-        mountpoint: ...
-    - streamer:
-        tag: str_imu
-        type: tcp-client
-        ip: 192.168.8.138
-        port: 9011
-        loop_duration: 0.001
-        buffer_length: 32768
-    - streamer:
-        tag: str_camera
-        type: tcp-client
-        ip: 192.168.8.138
-        port: 9021
-        buffer_length: 361472  # 752 * 480 + 512
+        output_tags: [str_gnss_rov]
+        port: /dev/ttyACM0
+        baudrate: 9600
+    # - streamer:
+    #     tag: str_gnss_ref
+    #     type: ntrip-client
+    #     ip: 101.132.190.162
+    #     port: 8001
+    #     username: ...
+    #     passward: ...
+    #     mountpoint: ...
+    # - streamer:
+    #     tag: str_gnss_eph
+    #     type: ntrip-client
+    #     ip: 101.132.190.162
+    #     port: 8001
+    #     username: ...
+    #     passward: ...
+    #     mountpoint: ...
+    # - streamer:
+    #     tag: str_gnss_ssr
+    #     output_tags: [fmt_gnss_ssr]
+    #     type: ntrip-client
+    #     ip: 112.65.161.226
+    #     port: 2101
+    #     username: ...
+    #     passward: ...
+    #     mountpoint: ...
+    # - streamer:
+    #     tag: str_imu
+    #     type: tcp-client
+    #     ip: 192.168.8.138
+    #     port: 9011
+    #     loop_duration: 0.001
+    #     buffer_length: 32768
+    # - streamer:
+    #     tag: str_camera
+    #     type: tcp-client
+    #     ip: 192.168.8.138
+    #     port: 9021
+    #     buffer_length: 361472  # 752 * 480 + 512
     - streamer:
         tag: str_gnss_rov_file
         input_tags: [str_gnss_rov]
         type: file
-        path: <output-directory>/gnss_rover.bin
-    - streamer:
-        tag: str_gnss_ref_file
-        input_tags: [str_gnss_ref]
-        type: file
-        path: <output-directory>/gnss_reference.bin
-    - streamer:
-        tag: str_gnss_eph_file
-        input_tags: [str_gnss_eph]
-        type: file
-        path: <output-directory>/gnss_ephemeris.bin
-    - streamer:
-        tag: str_gnss_ssr_file
-        input_tags: [str_gnss_ssr]
-        type: file
-        path: <output-directory>/gnss_ssr.bin
-    - streamer:
-        tag: str_imu_file
-        input_tags: [str_imu]
-        type: file
-        path: <output-directory>/imu.bin
-        loop_duration: 0.001
-    - streamer:
-        tag: str_camera_file
-        input_tags: [str_camera]
-        type: file
-        path: <output-directory>/camera.bin
-        buffer_length: 361472  # 752 * 480 + 512
+        path: /workspace/output/gnss_rover.ubx
+    # - streamer:
+    #     tag: str_gnss_ref_file
+    #     input_tags: [str_gnss_ref]
+    #     type: file
+    #     path: <output-directory>/gnss_reference.bin
+    # - streamer:
+    #     tag: str_gnss_eph_file
+    #     input_tags: [str_gnss_eph]
+    #     type: file
+    #     path: <output-directory>/gnss_ephemeris.bin
+    # - streamer:
+    #     tag: str_gnss_ssr_file
+    #     input_tags: [str_gnss_ssr]
+    #     type: file
+    #     path: <output-directory>/gnss_ssr.bin
+    # - streamer:
+    #     tag: str_imu_file
+    #     input_tags: [str_imu]
+    #     type: file
+    #     path: <output-directordy>/imu.bin
+    #     loop_duration: 0.001
+    # - streamer:
+    #     tag: str_camera_file
+    #     input_tags: [str_camera]
+    #     type: file
+    #     path: <output-directory>/camera.bin
+    #     buffer_length: 361472  # 752 * 480 + 512
 
-  formators:
-    - formator:
+  # formators:
+  #   - formator:
+  #       io: input
+  #       tag: fmt_gnss_rov
+  #       input_tags: [str_gnss_rov]
+  #       output_tags: [str_gnss_rov_file]
+  #       type: gnss-raw 
+  #       sub_type: ublox
+    # - formator:
+    #     io: log
+    #     tag: fmt_gnss_rov_conversion
+    #     input_tags: [fmt_gnss_rov]
+    #     output_tags: [str_gnss_rov_file]
+    #     type: gnss-rtcm-3
+
   replay:
     enable: false
 
@@ -86,7 +100,7 @@ estimate:
 
 
 logging:
-  enable: true
+  enable: false
   min_log_level: 1
   log_to_stderr: true
-  file_directory: <log-directory>
+  file_directory: /workspace/logs/

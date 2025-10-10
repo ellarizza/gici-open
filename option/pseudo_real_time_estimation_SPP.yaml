@@ -4,25 +4,28 @@ stream:
   streamers:
   - streamer:
       tag: str_gnss_rov_file
-      output_tags: [fmt_gnss_rov]
-      type: file
-      path: <data-directory>/gnss_rover.bin
+      type: post-file
+      path: /workspace/data/0516.obs
+      format:
+        type: gnss-rinex
   - streamer:
-      tag: str_gnss_eph
-      output_tags: [fmt_gnss_eph]
-      type: file
-      path: <data-directory>/gnss_ephemeris.bin
-  - streamer:
-      tag: str_dcb_file
-      output_tags: [fmt_dcb_file]
-      type: file
-      path: <gici-root-directory>/option/CAS0MGXRAP_20221580000_01D_01D_DCB.BSX
-      enable_time_tag: false
+      tag: str_gnss_eph_file
+      type: post-file
+      path: /workspace/data/0516.nav
+      burst_load: true
+      format:
+        type: gnss-rinex
+  # - streamer:
+  #     tag: str_dcb_file
+  #     output_tags: [fmt_dcb_file]
+  #     type: file
+  #     path: <gici-root-directory>/option/CAS0MGXRAP_20221580000_01D_01D_DCB.BSX
+  #     enable_time_tag: false
   - streamer:
       tag: str_solution_file
       input_tags: [fmt_solution_file]
       type: file
-      path: <output-directory>/spp_solution.txt
+      path: /workspace/output/spp_solution.txt
       enable_time_tag: false
 #   - streamer:
 #       tag: str_solution
@@ -49,20 +52,6 @@ stream:
 
   formators:
   - formator:
-      io: input
-      tag: fmt_gnss_rov
-      type: gnss-raw
-      sub_type: tersus
-  - formator:
-      io: input
-      tag: fmt_gnss_eph
-      type: gnss-rtcm-3
-      start_time: 2023.05.21
-  - formator:
-      io: input
-      tag: fmt_dcb_file
-      type: dcb-file
-  - formator:
       io: output
       tag: fmt_solution_file
       type: nmea 
@@ -78,13 +67,12 @@ estimate:
 - estimator:
     tag: est_spp
     type: spp
-    input_tags: [fmt_gnss_rov, fmt_gnss_eph, fmt_dcb_file]
+    input_tags: [str_gnss_rov_file, str_gnss_eph_file]
     fmt_gnss_rov_roles: [rover]
     fmt_gnss_eph_roles: [ephemeris]
-    fmt_dcb_file_roles: [code_bias]
     output_tags: [fmt_solution_file]
     # output_tags: [str_solution, str_solution_odometry, str_solution_path, fmt_solution_file]
-    output_align_tag: fmt_gnss_rov
+    output_align_tag: str_gnss_rov_file
     compute_covariance: false
     spp_options:
       estimate_velocity: false
@@ -105,5 +93,5 @@ estimate:
 logging:
   enable: true
   min_log_level: 0
-  log_to_stderr: true
-  file_directory: <log-directory>
+  log_to_stderr: false
+  file_directory: /workspace/logs/

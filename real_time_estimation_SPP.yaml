@@ -1,0 +1,69 @@
+stream:
+  streamers: 
+    - streamer:
+        tag: str_gnss_rov
+        output_tags: [fmt_gnss_rov, fmt_gnss_eph]
+        type: serial
+        port: ttyACM0
+        baudrate: 9600
+    - streamer:
+        tag: str_spp_solution_file
+        input_tags: [fmt_spp_solution_file]
+        type: file
+        path: /workspace/output/spp_solution.txt
+
+  formators:
+    - formator:
+        io: input
+        tag: fmt_gnss_rov
+        type: gnss-raw
+        sub_type: ublox
+        start_time: 2025.10.10
+    - formator:
+        io: input
+        tag: fmt_gnss_eph
+        type: gnss-raw
+        sub_type: ublox
+        start_time: 2025.10.10
+    - formator:
+        io: output
+        tag: fmt_spp_solution_file
+        type: nmea
+        use_esa: true
+        talked_id: GP
+  replay:
+    enable: false
+
+estimate:
+  - estimator:
+      tag: est_spp
+      type: spp
+      input_tags: [fmt_gnss_rov, fmt_gnss_eph]
+      fmt_gnss_rov_roles: [rover]
+      fmt_gnss_eph_roles: [ephemeris]
+      output_tags: [fmt_spp_solution_file]
+      output_align_tag: fmt_gnss_rov
+      compute_covariance: false
+      spp_options:
+        estimate_velocity: false
+      gnss_estimator_base_options:
+        gnss_common:
+          min_elevation: 15.0
+          min_SNR: [35.0]
+          #system_exclude: [R,E,C]
+        use_outlier_rejection: true
+        max_pesudorange_error: 10.0
+      estimator_base_options:
+        max_iteration: 10
+        num_threads: 2
+        max_solver_time: 0.05
+        verbose_output: true
+        solver_type: dense_normal_cholesky
+        trust_region_strategy_type: levenberg_marquardt
+
+
+logging:
+  enable: true
+  min_log_level: 0
+  log_to_stderr: false
+  file_directory: /workspace/logs/

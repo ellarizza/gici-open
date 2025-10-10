@@ -1,0 +1,27 @@
+stream:
+  streamers: 
+    - streamer:
+        tag: str_gnss_rov
+        output_tags: [str_gnss_rov_file]
+        type: serial
+        port: ttyACM0
+        baudrate: 9600
+    - streamer:
+        tag: str_gnss_rov_file
+        input_tags: [str_gnss_rov]
+        type: file
+        path: /workspace/output/gnss_rover.ubx
+
+  formators:
+  
+  replay:
+    enable: false
+
+estimate:
+
+
+logging:
+  enable: true
+  min_log_level: 1
+  log_to_stderr: false
+  file_directory: /workspace/logs/

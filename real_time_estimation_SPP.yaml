@@ -10,7 +10,7 @@ stream:
         tag: str_spp_solution_file
         input_tags: [fmt_spp_solution_file]
         type: file
-        path: /workspace/output/spp_solution.txt
+        path: /workspace/output/real_time_spp_solution.txt
 
   formators:
     - formator:
@@ -18,13 +18,11 @@ stream:
         tag: fmt_gnss_rov
         type: gnss-raw
         sub_type: ublox
-        start_time: 2025.10.10
     - formator:
         io: input
         tag: fmt_gnss_eph
         type: gnss-raw
         sub_type: ublox
-        start_time: 2025.10.10
     - formator:
         io: output
         tag: fmt_spp_solution_file

@@ -6,7 +6,8 @@
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "workspaceFolder": "/workspace",
-    "runArgs": ["--device=/dev/ttyACM0"],
+    "runArgs": ["--device=/dev/ttyUSB0"
+                ],
     "customizations": {
         "vscode": {
             "extensions": [

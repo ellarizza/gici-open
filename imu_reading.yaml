@@ -1,0 +1,14 @@
+stream:
+  streamers:
+  - streamer:
+      tag: str_imu
+      output_tags: [fmt_imu]
+      type: serial
+      port: ttyUSB0
+      baudrate: 460800
+
+  formators:
+  - formator:
+      io: input
+      tag: fmt_imu
+      type: imu-pack

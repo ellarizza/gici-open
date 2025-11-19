@@ -11,6 +11,7 @@
 
 #include <stdint.h>
 #include <math.h>
+#include "gici/utility/imu_epson/sensor_epsonCommon.h" 
 
 #include "gici/utility/rtklib_safe.h"
 

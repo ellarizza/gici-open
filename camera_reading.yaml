@@ -1,0 +1,19 @@
+stream:
+  streamers:
+  - streamer:
+      tag: str_camera
+      output_tags: [fmt_camera]
+      type: v4l2
+      port: video0
+      height: 
+      width: 
+      buffer_count: 
+
+  formators:
+  - formator:
+      io: input
+      tag: fmt_camera
+      type: image-v4l2
+      height:
+      width:
+      step: 

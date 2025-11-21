@@ -15,6 +15,7 @@
 #include <linux/videodev2.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <opencv2/opencv.hpp>
 
 namespace gici {
 
@@ -245,10 +246,10 @@ int V4l2Streamer::open(StreamerRWType type)
     LOG(ERROR) << "V4L2 device open failed!"; return 0;
   }
 
-  // Initialize video device 
+  // Initialize video device
   memset(&format, 0, sizeof(format));
   format.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
-  format.fmt.pix.pixelformat = V4L2_PIX_FMT_GREY;
+  format.fmt.pix.pixelformat = V4L2_PIX_FMT_MJPEG;
   format.fmt.pix.width = option_.width;
   format.fmt.pix.height = option_.height;
   if (ioctl(dev_, VIDIOC_TRY_FMT, &format) != 0) {
@@ -315,7 +316,7 @@ int V4l2Streamer::read(uint8_t *buf, int max_size)
 
   int nr, ret;
   v4l2_buffer buffer;
-  
+
   if (dev_ < 0) return 0;
 
   memset(&buffer, 0, sizeof(buffer));
@@ -327,19 +328,62 @@ int V4l2Streamer::read(uint8_t *buf, int max_size)
     LOG(ERROR) << "V4L2 VIDIOC_DQBUF failed!"; return 0;
   }
   if (buffer.index<0 || buffer.index >= option_.buffer_count) {
-    LOG(ERROR) << "V4L2: Invalid buffer index " << buffer.index << "!"; 
+    LOG(ERROR) << "V4L2: Invalid buffer index " << buffer.index << "!";
     return 0;
   }
- 
-  int length = option_.width * option_.height;
-  memcpy(buf, v4l2_buf[buffer.index], length);
- 
+
+  // Expected grayscale output size
+  int expected_grey_size = option_.width * option_.height;
+
+  // Check if output buffer has enough space
+  if (expected_grey_size > max_size) {
+    LOG(ERROR) << "V4L2: Output buffer too small. Need " << expected_grey_size
+               << " bytes, but only " << max_size << " available!";
+    ioctl(dev_, VIDIOC_QBUF, &buffer);
+    return 0;
+  }
+
+  // Get actual MJPEG compressed data size
+  int mjpeg_size = buffer.bytesused;
+  if (mjpeg_size <= 0 || mjpeg_size > 7680000) {
+    LOG(ERROR) << "V4L2: Invalid MJPEG buffer size: " << mjpeg_size;
+    ioctl(dev_, VIDIOC_QBUF, &buffer);
+    return 0;
+  }
+
+  // Decode MJPEG to BGR using OpenCV
+  std::vector<uint8_t> mjpeg_data(v4l2_buf[buffer.index],
+                                   v4l2_buf[buffer.index] + mjpeg_size);
+  cv::Mat img_bgr = cv::imdecode(mjpeg_data, cv::IMREAD_COLOR);
+
+  if (img_bgr.empty()) {
+    LOG(ERROR) << "V4L2: Failed to decode MJPEG frame!";
+    ioctl(dev_, VIDIOC_QBUF, &buffer);
+    return 0;
+  }
+
+  // Verify decoded image dimensions
+  if (img_bgr.cols != option_.width || img_bgr.rows != option_.height) {
+    LOG(ERROR) << "V4L2: Decoded image size mismatch. Expected "
+               << option_.width << "x" << option_.height
+               << ", got " << img_bgr.cols << "x" << img_bgr.rows;
+    ioctl(dev_, VIDIOC_QBUF, &buffer);
+    return 0;
+  }
+
+  // Convert BGR to grayscale
+  cv::Mat img_grey;
+  cv::cvtColor(img_bgr, img_grey, cv::COLOR_BGR2GRAY);
+
+  // Copy grayscale data to output buffer
+  memcpy(buf, img_grey.data, expected_grey_size);
+
   ret = ioctl(dev_, VIDIOC_QBUF, &buffer);
   if (ret != 0) {
     LOG(ERROR) << "V4L2 VIDIOC_QBUF failed!"; return 0;
   }
- 
-  return length;
+
+  return expected_grey_size;
 }
 
 // Write data to stream

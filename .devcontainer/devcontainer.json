@@ -1,12 +1,13 @@
 {
-    "name": "GICI-LIB Ubuntu 22.04",
+    "name": "GICI-LIB RPI5",
     "build": {
-        "dockerfile": "../Dockerfile",
+        "dockerfile": "../Dockerfile_rpi5",
         "context": ".."
     },
     "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
     "workspaceFolder": "/workspace",
-    "runArgs": ["--device=/dev/ttyUSB0"
+    "runArgs": [//"--device=/dev/ttyUSB0", 
+    "--device=/dev/video2"
                 ],
     "customizations": {
         "vscode": {

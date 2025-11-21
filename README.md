@@ -127,7 +127,7 @@ alt="non_ros" width="500" height="425" border="10" /></a>
 
 ## 4. Acknowledgment
 
-Many of the GNSS tools, I/O handlers, and message de/encoders are inherited from [RTKLIB](https://rtklib.com/). The basic FGO management and the visual and IMU factors are partly inherited from [OKVIS](https://github.com/ethz-asl/okvis). The feature handler is partly inherited from [SVO 2.0](https://github.com/uzh-rpg/rpg_svo_pro_open). Decoding IMU Epson message is done by source files from [imu_linux_example][https://github.com/cubicleguy/imu_linux_example/tree/main]. 
+Many of the GNSS tools, I/O handlers, and message de/encoders are inherited from [RTKLIB](https://rtklib.com/). The basic FGO management and the visual and IMU factors are partly inherited from [OKVIS](https://github.com/ethz-asl/okvis). The feature handler is partly inherited from [SVO 2.0](https://github.com/uzh-rpg/rpg_svo_pro_open). Decoding IMU Epson message is done by source files from [imu_linux_example](https://github.com/cubicleguy/imu_linux_example/tree/main). 
 
 ## 5. License
 
